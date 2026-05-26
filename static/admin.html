@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expo — Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #030712;
+      --card-bg: rgba(17, 24, 39, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #F9FAFB;
+      --text-muted: #9CA3AF;
+      --accent: #f43f5e;
+      --accent-glow: rgba(244, 63, 94, 0.3);
+      --secondary: #ec4899;
+      --secondary-glow: rgba(236, 72, 153, 0.3);
+      --input-bg: rgba(0, 0, 0, 0.3);
+      --ok: #10b981;
+      --err: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1,
+    h2,
+    h3,
+    .stat b {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .bg-orbs {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      animation: float 25s infinite ease-in-out alternate;
+    }
+
+    .orb-1 {
+      width: 50vw;
+      height: 50vw;
+      background: var(--accent-glow);
+      top: -20vw;
+      right: -10vw;
+      opacity: 0.5;
+    }
+
+    .orb-2 {
+      width: 45vw;
+      height: 45vw;
+      background: var(--secondary-glow);
+      bottom: -15vw;
+      left: -10vw;
+      opacity: 0.5;
+      animation-delay: -7s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      100% {
+        transform: translate(-5vw, 10vh) scale(1.1);
+      }
+    }
+
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(3, 7, 18, 0.5);
+      backdrop-filter: blur(12px);
+      animation: fadeUp 0.6s ease-out;
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #fff, var(--text-muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input,
+    textarea,
+    button {
+      font-family: 'Inter', sans-serif;
+      background: var(--input-bg);
+      color: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.2);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button.ghost {
+      background: transparent;
+    }
+
+    button.ghost:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      border: none;
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
+    }
+
+    .lang button {
+      padding: 0.4rem 0.8rem;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .lang button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      display: grid;
+      gap: 2rem;
+      animation: fadeUp 0.6s ease-out 0.2s both;
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-card h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .glass-card h2::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1em;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin: 1rem 0 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .stat:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 2.5rem;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .stat.highlight b {
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--input-bg);
+      transition: .4s;
+      border-radius: 34px;
+      border: 1px solid var(--card-border);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text-muted);
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: rgba(16, 185, 129, 0.2);
+      border-color: var(--ok);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(22px);
+      background-color: var(--ok);
+      box-shadow: 0 0 10px var(--ok);
+    }
+
+    .toast {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .toast.ok {
+      color: var(--ok);
+    }
+
+    .toast.err {
+      color: var(--err);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="particles-js" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-2; background:var(--bg);"></div>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+  <header>
+    <h1 data-i18n="title">Admin Control Matrix</h1>
+    <div class="row">
+      <div class="lang">
+        <button type="button" data-lang="en" class="active">EN</button>
+        <button type="button" data-lang="zh">ZH</button>
+      </div>
+      <div class="row"
+        style="background: var(--input-bg); padding: 0.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+        <input type="password" id="adminKey" placeholder="Admin Key"
+          style="border:none; background:transparent; padding:0.5rem;" autocomplete="off" />
+        <button type="button" class="primary" id="saveKey" style="padding: 0.5rem 1rem;">Authenticate</button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="glass-card">
+      <h2 data-i18n="stats_title">Registration Overview</h2>
+      <div class="stats">
+        <div class="stat highlight"><span data-i18n="total">Total</span><b id="total">0</b></div>
+        <div class="stat highlight"><span data-i18n="checked_in">Checked In</span><b id="checked_in_cnt">0</b></div>
+        <div class="stat"><span data-i18n="g">General</span><b id="c1">0</b></div>
+        <div class="stat"><span data-i18n="tr">Trade</span><b id="c2">0</b></div>
+        <div class="stat"><span data-i18n="pr">Press</span><b id="c3">0</b></div>
+        <div class="stat" style="grid-column: 1 / -1; display:flex; justify-content:space-between; align-items:center;">
+          <span data-i18n="cd" style="margin:0;">Countdown Target</span>
+          <b id="cd_disp" style="font-size:1.25rem;">—</b>
+        </div>
+      </div>
+      <div class="toast" id="loadToast"></div>
+    </section>
+
+    <section class="glass-card">
+      <h2 data-i18n="ctrl">Event Controls</h2>
+
+      <div style="display:grid; gap: 1rem; grid-template-columns: 1fr auto; align-items: end;">
+        <div>
+          <label data-i18n="cd_input">Countdown Date & Time (Local)</label>
+          <input type="datetime-local" id="cdLocal" style="width: 100%;" />
+        </div>
+        <button type="button" class="ghost" id="clearCd" data-i18n="clear_cd">Clear</button>
+      </div>
+
+      <div class="switch-wrap">
+        <label class="switch"><input type="checkbox" id="open" checked><span class="slider"></span></label>
+        <span style="font-weight: 500;" data-i18n="open_label">Registration Open</span>
+      </div>
+
+      <label data-i18n="msg">Public Bulletin Message (Optional)</label>
+      <textarea id="msg" rows="3" maxlength="2000" style="width: 100%; resize: vertical;"
+        placeholder="Enter message to broadcast on public dashboard..."></textarea>
+
+      <div style="margin-top: 2rem; display: flex; align-items: center; gap: 1rem;">
+        <button type="button" class="primary" id="btnSave" style="padding: 1rem 2rem; font-size: 1rem;"
+          data-i18n="save">Deploy Changes</button>
+        <div class="toast" id="saveToast"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const I18N = {
+      en: { title: "Admin Control Matrix", stats_title: "Registration Overview", total: "Total", checked_in: "Checked In", g: "General", tr: "Trade", pr: "Press", cd: "Countdown Target", ctrl: "Event Controls", cd_input: "Countdown Date & Time (Local)", clear_cd: "Clear", open_label: "Registration Open", msg: "Public Bulletin Message (Optional)", save: "Deploy Changes", need_key: "Authentication required.", saved: "Authenticated.", load_err: "Connection lost.", save_ok: "Deployment successful.", save_err: "Deployment failed." },
+      zh: { title: "管理员控制台", stats_title: "注册概览", total: "总计", checked_in: "已签到", g: "普通", tr: "行业", pr: "媒体", cd: "倒计时目标", ctrl: "活动控制", cd_input: "倒计时日期和时间 (本地)", clear_cd: "清除", open_label: "开放注册", msg: "公开公告消息 (可选)", save: "部署更改", need_key: "需要身份验证。", saved: "已认证。", load_err: "连接丢失。", save_ok: "部署成功。", save_err: "部署失败。" }
+    };
+    let lang = localStorage.getItem("expo_lang") || "en";
+    function t(k) { return (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k; }
+    function applyLang() { document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (k) el.textContent = t(k); }); document.querySelectorAll(".lang button").forEach(b => b.classList.toggle("active", b.dataset.lang === lang)); }
+    document.querySelectorAll(".lang button").forEach(b => { b.addEventListener("click", () => { lang = b.dataset.lang; localStorage.setItem("expo_lang", lang); applyLang(); load(); }); });
+
+    function showToast(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = `toast show ${type}`; setTimeout(() => el.classList.remove('show'), 3000); }
+
+    const adminKeyInput = document.getElementById("adminKey");
+    adminKeyInput.value = localStorage.getItem("admin_key") || "";
+    document.getElementById("saveKey").addEventListener("click", () => { localStorage.setItem("admin_key", adminKeyInput.value.trim()); showToast("saveToast", t("saved"), "ok"); load(); });
+
+    function ah() { return { "X-Admin-Key": localStorage.getItem("admin_key") || "" }; }
+
+    function toLocalInput(iso) { if (!iso) return ""; const d = new Date(iso), pad = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+    function fromLocalInput(val) { if (!val) return null; const d = new Date(val); return Number.isNaN(d.getTime()) ? null : d.toISOString(); }
+
+    async function load() {
+      if (!localStorage.getItem("admin_key")) { showToast("loadToast", t("need_key"), "err"); return; }
+      const r = await fetch("/api/admin/stats", { headers: ah() });
+      if (!r.ok) { showToast("loadToast", t("load_err"), "err"); return; }
+      const d = await r.json();
+      document.getElementById("total").textContent = String(d.total_registered ?? 0);
+      document.getElementById("checked_in_cnt").textContent = String(d.total_checked_in ?? 0);
+      const c = d.count_by_category || {};
+      document.getElementById("c1").textContent = String(c.general ?? 0);
+      document.getElementById("c2").textContent = String(c.trade ?? 0);
+      document.getElementById("c3").textContent = String(c.press ?? 0);
+      document.getElementById("cdLocal").value = toLocalInput(d.countdown_target_utc);
+      document.getElementById("open").checked = !!d.registration_open;
+      document.getElementById("msg").value = d.public_message || "";
+      document.getElementById("cd_disp").textContent = d.countdown_target_utc ? new Date(d.countdown_target_utc).toLocaleString() : "—";
+    }
+
+    document.getElementById("clearCd").addEventListener("click", () => { document.getElementById("cdLocal").value = ""; });
+
+    document.getElementById("btnSave").addEventListener("click", async () => {
+      if (!localStorage.getItem("admin_key")) { showToast("saveToast", t("need_key"), "err"); return; }
+      const cdVal = document.getElementById("cdLocal").value;
+      const body = { countdown_target_utc: cdVal ? fromLocalInput(cdVal) : null, registration_open: document.getElementById("open").checked, public_message: document.getElementById("msg").value.trim() || null };
+      const r = await fetch("/api/admin/config", { method: "PUT", headers: { ...ah(), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (!r.ok) { showToast("saveToast", t("save_err"), "err"); return; }
+      showToast("saveToast", t("save_ok"), "ok"); load();
+    });
+
+    applyLang(); load(); setInterval(load, 15000);
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    if(window.particlesJS) {
+      particlesJS("particles-js", {"particles":{"number":{"value":60,"density":{"enable":true,"value_area":800}},"color":{"value":"#06b6d4"},"shape":{"type":"circle"},"opacity":{"value":0.4,"random":false},"size":{"value":2,"random":true},"line_linked":{"enable":true,"distance":150,"color":"#06b6d4","opacity":0.3,"width":1},"move":{"enable":true,"speed":1.5,"direction":"none","random":false,"straight":false,"out_mode":"out","bounce":false}},"interactivity":{"detect_on":"window","events":{"onhover":{"enable":true,"mode":"grab"},"onclick":{"enable":true,"mode":"push"},"resize":true},"modes":{"grab":{"distance":200,"line_linked":{"opacity":0.6}},"push":{"particles_nb":3}}},"retina_detect":true});
+    }
+  </script>
+</body>
+
+</html>
