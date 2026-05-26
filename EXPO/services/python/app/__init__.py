@@ -1,1 +1,0 @@
-# Expo registration service
