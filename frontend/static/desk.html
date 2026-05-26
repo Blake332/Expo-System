@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expo — Registration Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #030712;
+      --card-bg: rgba(17, 24, 39, 0.5);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #F9FAFB;
+      --text-muted: #9CA3AF;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.4);
+      --secondary: #06b6d4;
+      --secondary-glow: rgba(6, 182, 212, 0.4);
+      --input-bg: rgba(0, 0, 0, 0.3);
+      --ok: #10b981;
+      --err: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg); color: var(--text-main);
+      font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden;
+    }
+    h1, h2, h3, th { font-family: 'Outfit', sans-serif; }
+    
+    .bg-orbs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(140px); animation: float 25s infinite ease-in-out alternate; }
+    .orb-1 { width: 50vw; height: 50vw; background: var(--accent-glow); top: -20vw; right: -10vw; opacity: 0.5; }
+    .orb-2 { width: 45vw; height: 45vw; background: var(--secondary-glow); bottom: -15vw; left: -10vw; opacity: 0.5; animation-delay: -7s; }
+    
+    @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-5vw, 10vh) scale(1.1); } }
+    @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    header {
+      padding: 1.5rem 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+      border-bottom: 1px solid var(--card-border); background: rgba(3, 7, 18, 0.5); backdrop-filter: blur(12px);
+      animation: fadeUp 0.6s ease-out;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: linear-gradient(90deg, #fff, var(--text-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    
+    input, select, textarea, button {
+      font-family: 'Inter', sans-serif; background: var(--input-bg); color: #fff;
+      border: 1px solid var(--card-border); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.9rem;
+      transition: all 0.3s ease; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+    select option { background: var(--bg); color: #fff; }
+    
+    button { cursor: pointer; font-weight: 600; }
+    button.ghost { background: transparent; }
+    button.ghost:hover { background: rgba(255,255,255,0.05); }
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--secondary)); border: none; color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+    button.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+    
+    .lang button { padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.05); }
+    .lang button.active { border-color: var(--accent); color: var(--accent); }
+    
+    main { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; display: grid; gap: 2rem; animation: fadeUp 0.6s ease-out 0.2s both; }
+    @media(min-width:900px){ main { grid-template-columns: 1fr 1.5fr; align-items: start; } }
+    
+    .glass-card {
+      background: var(--card-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border: 1px solid var(--card-border); border-radius: 20px; padding: 2.5rem;
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .glass-card h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .glass-card h2::before { content: ''; display: inline-block; width: 4px; height: 1em; background: var(--accent); border-radius: 2px; }
+    
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; }
+    
+    table { width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; margin-top: 1rem; font-size: 0.9rem; }
+    th { text-align: left; padding: 0.5rem 1rem; color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--card-border); }
+    td { padding: 1rem; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.2s; }
+    td:first-child { border-left: 1px solid rgba(255,255,255,0.02); border-radius: 12px 0 0 12px; font-weight: 500; color: #fff; }
+    td:last-child { border-right: 1px solid rgba(255,255,255,0.02); border-radius: 0 12px 12px 0; }
+    tr:hover td { background: rgba(0,0,0,0.4); }
+    
+    .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 0.5rem; z-index: 50; }
+    .toast { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); padding: 1rem 1.5rem; border-radius: 12px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .toast.show { transform: translateX(0); }
+    .toast.ok { border-left: 4px solid var(--ok); }
+    .toast.err { border-left: 4px solid var(--err); }
+  </style>
+</head>
+<body>
+  <div id="particles-js" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-2; background:var(--bg);"></div>
+  <div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <header>
+    <h1 data-i18n="title">Registration Desk</h1>
+    <div class="row">
+      <div class="lang">
+        <button type="button" data-lang="en" class="active">EN</button>
+        <button type="button" data-lang="zh">ZH</button>
+      </div>
+      <div class="row" style="background: var(--input-bg); padding: 0.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+        <input type="password" id="deskKey" placeholder="Desk Key" style="border:none; background:transparent; padding:0.5rem;" autocomplete="off" />
+        <button type="button" class="primary" id="saveKey" style="padding: 0.5rem 1rem;">Auth</button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="glass-card">
+      <h2 data-i18n="register">Register Attendee</h2>
+      <div class="form-group"><label data-i18n="full_name">Full name</label><input id="fullName" maxlength="200" /></div>
+      <div class="form-group"><label data-i18n="company">Company / Org</label><input id="company" maxlength="255" /></div>
+      <div class="form-group"><label data-i18n="email">Email</label><input id="email" type="email" /></div>
+      <div class="form-group"><label data-i18n="phone">Phone</label><input id="phone" maxlength="64" /></div>
+      <div class="form-group"><label data-i18n="category">Category</label><select id="category"><option value="general">General</option><option value="trade">Trade / industry</option><option value="press">Press / media</option></select></div>
+      <div class="form-group"><label data-i18n="notes">Notes (optional)</label><textarea id="notes" rows="2"></textarea></div>
+      <div style="margin-top:2rem;"><button type="button" class="primary" id="btnReg" style="width: 100%; padding: 1rem;" data-i18n="submit">Save Registration</button></div>
+    </section>
+    
+    <section class="glass-card">
+      <h2 data-i18n="lookup">Directory Lookup</h2>
+      <div class="row" style="width:100%;">
+        <input id="q" placeholder="Search by name..." style="flex:1;" />
+        <button type="button" class="primary" id="btnLook" data-i18n="search">Search</button>
+      </div>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin:0.5rem 0 0;" data-i18n="hint">Type at least 2 characters.</p>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead><tr><th data-i18n="th_name">Name</th><th data-i18n="th_comp">Company</th><th data-i18n="th_cat">Category</th><th data-i18n="th_act">Action</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-container" id="toaster"></div>
+
+  <script>
+    const I18N = {
+      en: { title: "Registration Desk", register: "Register Attendee", full_name: "Full name", company: "Company / Org", email: "Email", phone: "Phone", category: "Category", notes: "Notes (optional)", submit: "Save Registration", lookup: "Directory Lookup", search: "Search", hint: "Type at least 2 characters.", th_name: "Name", th_comp: "Company", th_cat: "Category", th_act: "Action", need_key: "Authentication required.", saved: "Authenticated.", reg_ok: "Registration successful.", reg_fail: "Registration failed.", look_fail: "Lookup failed.", none: "No records found.", cat_general: "General", cat_trade: "Trade / Industry", cat_press: "Press / Media", checkin: "Check In", checked: "Arrived" },
+      zh: { title: "接待处", register: "登记参会人员", full_name: "全名", company: "公司 / 组织", email: "电子邮件", phone: "电话", category: "类别", notes: "备注 (可选)", submit: "保存注册信息", lookup: "目录查询", search: "搜索", hint: "请至少输入2个字符。", th_name: "姓名", th_comp: "公司", th_cat: "类别", th_act: "操作", need_key: "需要身份验证。", saved: "已认证。", reg_ok: "注册成功。", reg_fail: "注册失败。", look_fail: "查询失败。", none: "未找到记录。", cat_general: "普通", cat_trade: "行业", cat_press: "媒体", checkin: "签到", checked: "已签到" }
+    };
+    let lang = localStorage.getItem("expo_lang") || "en";
+    function t(k) { return (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k; }
+    function applyLang() {
+      document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (k) el.textContent = t(k); });
+      document.querySelectorAll(".lang button").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
+      document.getElementById("q").placeholder = t("search") + "...";
+      const sel = document.getElementById("category");
+      sel.options[0].text = t("cat_general"); sel.options[1].text = t("cat_trade"); sel.options[2].text = t("cat_press");
+    }
+    document.querySelectorAll(".lang button").forEach(b => { b.addEventListener("click", () => { lang = b.dataset.lang; localStorage.setItem("expo_lang", lang); applyLang(); }); });
+
+    function showToast(msg, type) {
+      const toaster = document.getElementById("toaster");
+      const el = document.createElement("div");
+      el.className = `toast ${type}`; el.textContent = msg;
+      toaster.appendChild(el);
+      requestAnimationFrame(() => el.classList.add("show"));
+      setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 400); }, 4000);
+    }
+
+    const deskKeyInput = document.getElementById("deskKey");
+    deskKeyInput.value = localStorage.getItem("desk_key") || "";
+    document.getElementById("saveKey").addEventListener("click", () => { localStorage.setItem("desk_key", deskKeyInput.value.trim()); showToast(t("saved"), "ok"); });
+
+    function headers() { return { "Content-Type": "application/json", "X-Desk-Key": localStorage.getItem("desk_key") || "" }; }
+
+    document.getElementById("btnReg").addEventListener("click", async () => {
+      if (!localStorage.getItem("desk_key")) { showToast(t("need_key"), "err"); return; }
+      const body = {
+        full_name: document.getElementById("fullName").value.trim(),
+        company: document.getElementById("company").value.trim() || null,
+        email: document.getElementById("email").value.trim() || null,
+        phone: document.getElementById("phone").value.trim() || null,
+        category: document.getElementById("category").value,
+        notes: document.getElementById("notes").value.trim() || null,
+      };
+      if (!body.full_name) { showToast(t("full_name") + " *", "err"); return; }
+      const r = await fetch("/api/desk/register", { method: "POST", headers: headers(), body: JSON.stringify(body) });
+      if (!r.ok) { showToast((await r.json().catch(()=>({}))).detail || t("reg_fail"), "err"); return; }
+      showToast(t("reg_ok"), "ok");
+      ["fullName", "company", "email", "phone", "notes"].forEach(id => document.getElementById(id).value = "");
+    });
+
+    async function doCheckIn(id) {
+      if (!localStorage.getItem("desk_key")) return;
+      const r = await fetch("/api/desk/checkin/" + id, { method: "POST", headers: headers() });
+      if (r.ok) { showToast("Check In Recorded", "ok"); runLookup(); }
+    }
+
+    async function runLookup() {
+      if (!localStorage.getItem("desk_key")) { showToast(t("need_key"), "err"); return; }
+      const q = document.getElementById("q").value.trim();
+      if (q.length < 2) { showToast(t("hint"), "err"); return; }
+      const r = await fetch("/api/desk/lookup?q=" + encodeURIComponent(q), { headers: { "X-Desk-Key": localStorage.getItem("desk_key") || "" } });
+      const tbody = document.getElementById("rows"); tbody.innerHTML = "";
+      if (!r.ok) { showToast(t("look_fail"), "err"); return; }
+      const rows = await r.json();
+      if (!rows.length) { showToast(t("none"), ""); return; }
+      const catLabel = { general: () => t("cat_general"), trade: () => t("cat_trade"), press: () => t("cat_press") };
+      for (const x of rows) {
+        const tr = document.createElement("tr");
+        const comp = escapeHtml(x.company || "—");
+        const btn = x.checked_in 
+          ? `<span style="color:var(--ok); font-weight:600; font-size:0.85rem;">✓ ${t("checked")}</span>` 
+          : `<button type="button" class="primary" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="doCheckIn(${x.id})">${t("checkin")}</button>`;
+        tr.innerHTML = `<td>${escapeHtml(x.full_name)}</td><td>${comp}</td><td><span style="background:rgba(255,255,255,0.1);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.8rem;">${catLabel[x.category]()}</span></td><td>${btn}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+    function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+    document.getElementById("btnLook").addEventListener("click", runLookup);
+    document.getElementById("q").addEventListener("keydown", e => { if (e.key === "Enter") runLookup(); });
+
+    applyLang();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    if(window.particlesJS) {
+      particlesJS("particles-js", {"particles":{"number":{"value":60,"density":{"enable":true,"value_area":800}},"color":{"value":"#06b6d4"},"shape":{"type":"circle"},"opacity":{"value":0.4,"random":false},"size":{"value":2,"random":true},"line_linked":{"enable":true,"distance":150,"color":"#06b6d4","opacity":0.3,"width":1},"move":{"enable":true,"speed":1.5,"direction":"none","random":false,"straight":false,"out_mode":"out","bounce":false}},"interactivity":{"detect_on":"window","events":{"onhover":{"enable":true,"mode":"grab"},"onclick":{"enable":true,"mode":"push"},"resize":true},"modes":{"grab":{"distance":200,"line_linked":{"opacity":0.6}},"push":{"particles_nb":3}}},"retina_detect":true});
+    }
+  </script>
+</body>
+</html>
